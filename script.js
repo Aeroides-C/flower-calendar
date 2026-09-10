@@ -1,37 +1,27 @@
-// ========== 初始化 ==========
-
-function init() {
-
-    // 默认目标日期设为本周日
+document.addEventListener("DOMContentLoaded", function () {
     setDefaultTargetDate();
+});
 
-}
-
-
-// ========== 设置默认目标日期 ==========
 
 function setDefaultTargetDate() {
+    const targetDateInput = document.getElementById("targetDate");
+
+    if (!targetDateInput) {
+        console.error("找不到 id=targetDate 的日期输入框");
+        return;
+    }
 
     const now = new Date();
 
     const dayOfWeek = now.getDay();
-    // 0 = 周日
-    // 1 = 周一
-    // ...
-    // 6 = 周六
-
     const daysUntilSunday =
-        dayOfWeek === 0
-            ? 0
-            : 7 - dayOfWeek;
-
+        dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
 
     const sunday = new Date(now);
 
     sunday.setDate(
         now.getDate() + daysUntilSunday
     );
-
 
     const yyyy =
         sunday.getFullYear();
@@ -46,84 +36,84 @@ function setDefaultTargetDate() {
             sunday.getDate()
         ).padStart(2, "0");
 
-
-    document.getElementById(
-        "targetDate"
-    ).value =
+    targetDateInput.value =
         `${yyyy}-${mm}-${dd}`;
-
 }
 
 
-// ========== 核心计算 ==========
-
 function calculate() {
-
     const hoursInput =
-        document.getElementById(
-            "hoursInput"
-        ).value;
-
+        document.getElementById("hoursInput");
 
     const targetDateInput =
-        document.getElementById(
-            "targetDate"
-        ).value;
-
+        document.getElementById("targetDate");
 
     const resultDiv =
-        document.getElementById(
-            "result"
-        );
-
+        document.getElementById("result");
 
     const resultBody =
-        document.getElementById(
-            "resultBody"
-        );
+        document.getElementById("resultBody");
 
 
-    // ========== 输入验证 ==========
-
-    if (
-        !hoursInput ||
-        Number(hoursInput) <= 0
-    ) {
-
-        showError(
-            "请输入成熟时间～"
-        );
-
+    // 检查 HTML 元素是否存在
+    if (!hoursInput) {
+        console.error("找不到 id=hoursInput 的成熟时间输入框");
         return;
+    }
 
+    if (!targetDateInput) {
+        console.error("找不到 id=targetDate 的日期输入框");
+        return;
+    }
+
+    if (!resultDiv || !resultBody) {
+        console.error("找不到结果显示区域");
+        return;
     }
 
 
-    if (!targetDateInput) {
+    const hoursValue =
+        hoursInput.value;
 
+    const targetValue =
+        targetDateInput.value;
+
+
+    // 输入验证
+    if (
+        !hoursValue ||
+        Number(hoursValue) <= 0
+    ) {
+        showError(
+            "请输入正确的成熟时间～"
+        );
+
+        return;
+    }
+
+
+    if (!targetValue) {
         showError(
             "请选择期望开花的日期～"
         );
 
         return;
-
     }
 
 
     const hours =
-        Number(hoursInput);
+        Number(hoursValue);
 
 
+    // 目标开花日期
     const targetDate =
         new Date(
-            targetDateInput +
+            targetValue +
             "T00:00:00"
         );
 
 
-    // ========== 目标日期范围 ==========
-    // 从当天 00:00 到 23:59
-
+    // 开花日期当天 00:00
     const targetStart =
         new Date(targetDate);
 
@@ -135,6 +125,7 @@ function calculate() {
     );
 
 
+    // 开花日期当天 23:59
     const targetEnd =
         new Date(targetDate);
 
@@ -146,8 +137,7 @@ function calculate() {
     );
 
 
-    // ========== 倒推种植窗口 ==========
-
+    // 成熟时间换算成毫秒
     const matureMilliseconds =
         hours *
         60 *
@@ -155,6 +145,7 @@ function calculate() {
         1000;
 
 
+    // 倒推最早种植时间
     const plantStart =
         new Date(
             targetStart.getTime()
@@ -162,6 +153,7 @@ function calculate() {
         );
 
 
+    // 倒推最晚种植时间
     const plantEnd =
         new Date(
             targetEnd.getTime()
@@ -169,36 +161,14 @@ function calculate() {
         );
 
 
-    // ========== 格式化日期 ==========
-
     const now =
         new Date();
 
 
-    const plantStartStr =
-        formatDateTime(
-            plantStart
-        );
-
-
-    const plantEndStr =
-        formatDateTime(
-            plantEnd
-        );
-
-
-    const targetStr =
-        formatDate(
-            targetDate
-        );
-
-
-    // ========== 判断当前状态 ==========
-
     let statusHTML = "";
 
 
-    // 种植窗口已经结束
+    // 已经过了种植窗口
     if (now > plantEnd) {
 
         statusHTML = `
@@ -210,7 +180,7 @@ function calculate() {
     }
 
 
-    // 当前正处于种植窗口
+    // 当前就在种植窗口
     else if (
         now >= plantStart &&
         now <= plantEnd
@@ -231,7 +201,7 @@ function calculate() {
     }
 
 
-    // 还没有到种植时间
+    // 还没到种植时间
     else {
 
         const diffMs =
@@ -239,72 +209,60 @@ function calculate() {
             - now.getTime();
 
 
-        const diffMinutes =
+        const totalMinutes =
             Math.floor(
                 diffMs /
-                (1000 * 60)
+                60000
             );
 
 
-        const diffDays =
+        const days =
             Math.floor(
-                diffMinutes /
-                (24 * 60)
+                totalMinutes /
+                1440
             );
 
 
-        const remainMinutesAfterDays =
-            diffMinutes %
-            (24 * 60);
-
-
-        const diffHours =
+        const hoursLeft =
             Math.floor(
-                remainMinutesAfterDays /
-                60
+                (
+                    totalMinutes %
+                    1440
+                ) / 60
             );
 
 
-        const remainMinutes =
-            remainMinutesAfterDays %
-            60;
+        const minutesLeft =
+            totalMinutes % 60;
 
 
         let waitStr = "";
 
 
-        if (diffDays > 0) {
-
+        if (days > 0) {
             waitStr +=
-                `${diffDays}天`;
-
+                `${days}天`;
         }
 
 
-        if (diffHours > 0) {
-
+        if (hoursLeft > 0) {
             waitStr +=
-                `${diffHours}小时`;
-
+                `${hoursLeft}小时`;
         }
 
 
         if (
-            diffDays === 0 &&
-            remainMinutes > 0
+            days === 0 &&
+            minutesLeft > 0
         ) {
-
             waitStr +=
-                `${remainMinutes}分钟`;
-
+                `${minutesLeft}分钟`;
         }
 
 
         if (!waitStr) {
-
             waitStr =
                 "不到1分钟";
-
         }
 
 
@@ -323,154 +281,94 @@ function calculate() {
     }
 
 
-    // ========== 构建结果 ==========
-
     resultBody.innerHTML = `
-
         <div style="margin-bottom: 8px;">
-
             🌱
-
             <span class="tag">
-                成熟周期 ${formatHours(hours)}
+                成熟周期 ${hours} 小时
             </span>
-
         </div>
-
 
         <hr>
 
-
         <div>
-
             📅
-            <strong>
-                期望开花：
-            </strong>
-
-            ${targetStr}
-
+            <strong>期望开花：</strong>
+            ${formatDate(targetDate)}
             （当天 00:00 ~ 23:59）
-
         </div>
 
-
         <div style="margin-top: 6px;">
-
             🕐
-            <strong>
-                种植窗口：
-            </strong>
-
+            <strong>种植窗口：</strong>
             <br>
 
             <span class="highlight">
-                ${plantStartStr}
+                ${formatDateTime(plantStart)}
             </span>
 
             ～
 
             <span class="highlight">
-                ${plantEndStr}
+                ${formatDateTime(plantEnd)}
             </span>
-
         </div>
 
-
         ${statusHTML}
-
     `;
 
 
-    // 显示结果区域
     resultDiv.style.display =
         "block";
 
 
-    // 平滑滚动到结果区域
     resultDiv.scrollIntoView({
-
         behavior: "smooth",
-
         block: "center"
-
     });
-
 }
 
 
-// ========== 错误提示 ==========
-
-function showError(msg) {
-
+function showError(message) {
     const resultDiv =
-        document.getElementById(
-            "result"
-        );
-
+        document.getElementById("result");
 
     const resultBody =
-        document.getElementById(
-            "resultBody"
-        );
+        document.getElementById("resultBody");
+
+    if (!resultDiv || !resultBody) {
+        return;
+    }
 
 
     resultBody.innerHTML = `
-
-        <div
-            style="
-                color: #c62828;
-            "
-        >
-            😢 ${msg}
+        <div style="color: #c62828;">
+            😢 ${message}
         </div>
-
     `;
 
 
     resultDiv.style.display =
         "block";
-
-
-    resultDiv.scrollIntoView({
-
-        behavior: "smooth",
-
-        block: "center"
-
-    });
-
 }
 
 
-// ========== 日期时间格式化 ==========
-
 function formatDateTime(date) {
-
     const month =
         date.getMonth() + 1;
-
 
     const day =
         date.getDate();
 
-
-    const hours =
+    const hour =
         String(
             date.getHours()
-        ).padStart(
-            2,
-            "0"
-        );
+        ).padStart(2, "0");
 
-
-    const minutes =
+    const minute =
         String(
             date.getMinutes()
-        ).padStart(
-            2,
-            "0"
-        );
+        ).padStart(2, "0");
 
 
     const weekdays = [
@@ -493,19 +391,14 @@ function formatDateTime(date) {
     return (
         `${month}月${day}日` +
         `（周${weekday}）` +
-        `${hours}:${minutes}`
+        `${hour}:${minute}`
     );
-
 }
 
 
-// ========== 日期格式化 ==========
-
 function formatDate(date) {
-
     const month =
         date.getMonth() + 1;
-
 
     const day =
         date.getDate();
@@ -532,25 +425,4 @@ function formatDate(date) {
         `${month}月${day}日` +
         `（周${weekday}）`
     );
-
 }
-
-
-// ========== 成熟时间格式化 ==========
-
-function formatHours(hours) {
-
-    if (Number.isInteger(hours)) {
-
-        return `${hours} 小时`;
-
-    }
-
-    return `${hours} 小时`;
-
-}
-
-
-// ========== 启动 ==========
-
-init();
