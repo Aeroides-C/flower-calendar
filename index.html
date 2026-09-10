@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 小花仙种植时间计算器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部装饰 -->
+        <div class="header">
+            <h1>🌸 小花仙种植时间计算器</h1>
+            <p class="subtitle">再也不怕算错时间啦～</p>
+        </div>
+
+        <!-- 主卡片 -->
+        <div class="card">
+            <!-- 选择花种 -->
+            <div class="form-group">
+                <label for="flowerSelect">🌺 选择花种</label>
+                <select id="flowerSelect">
+                    <option value="">-- 请选择花种 --</option>
+                </select>
+            </div>
+
+            <!-- 或手动输入 -->
+            <div class="divider">
+                <span>或者手动输入</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="hoursInput">⏱️ 成熟时间（小时）</label>
+                    <input type="number" id="hoursInput" min="1" max="999" placeholder="比如 30">
+                </div>
+                <div class="form-group half">
+                    <label for="flowerName">🌼 花名（可选）</label>
+                    <input type="text" id="flowerName" placeholder="自定义花名">
+                </div>
+            </div>
+
+            <!-- 目标日期 -->
+            <div class="form-group">
+                <label for="targetDate">📅 期望开花日期</label>
+                <input type="date" id="targetDate">
+            </div>
+
+            <!-- 计算按钮 -->
+            <button class="btn-calculate" onclick="calculate()">
+                ✨ 计算种植时间
+            </button>
+
+            <!-- 结果区域 -->
+            <div class="result" id="result" style="display: none;">
+                <div class="result-header">📋 计算结果</div>
+                <div class="result-body" id="resultBody"></div>
+            </div>
+        </div>
+
+        <!-- 底部提示 -->
+        <p class="footer-note">
+            💡 提示：在种植窗口内的任意时间播种，都能在目标日期开花哦～
+        </p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
