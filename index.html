@@ -9,32 +9,28 @@
 <body>
     <div class="container">
         <h1>🌸 种花计算器</h1>
-
-        <!-- 种植时间 -->
-        <div class="card">
-            <label for="plantTime">🌱 种植时间：</label>
+        
+        <!-- 第一行：种植时间选择 -->
+        <div class="input-group">
+            <label>🌱 种植时间：</label>
             <input type="datetime-local" id="plantTime">
-            <button class="calc-btn" onclick="calculate()">⏳ 计算收获时间</button>
+            <button onclick="calculate()">⏳ 计算收获时间</button>
         </div>
 
-        <!-- 收获时间 -->
-        <div class="card">
+        <!-- 第二行：显示结果 -->
+        <div class="result-box">
             <p>📅 收获时间：<span id="harvestTime">--</span></p>
         </div>
 
-        <!-- 倒计时 -->
-        <div class="card">
+        <!-- 第三行：显示倒计时 -->
+        <div class="result-box">
             <p>⏱️ 倒计时：<span id="countdown">--</span></p>
         </div>
 
-        <!-- 提示 -->
-        <div class="tip">
-            💡 提示：选择种植时间后点击计算，即可查看收获时间和倒计时。
-        </div>
-
-        <!-- 版权信息 -->
+        <!-- 底部提示与版权 -->
         <div class="footer-info">
-            <p>📕 作者：6A6C9B30</p>
+            <p>💡 提示：选择种植时间后点击计算，即可查看收获时间和倒计时。</p>
+            <p>🟥 作者：6A6C9B30</p>
             <p>© 相关IP知识产权属于游戏原公司</p>
         </div>
     </div>
